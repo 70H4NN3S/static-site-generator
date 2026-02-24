@@ -87,6 +87,16 @@ class TestInlineMarkdown(unittest.TestCase):
             ],
             new_nodes,
         )
+    
+    def test_only_bold(self):
+        node = TextNode("**only bold**", TextType.TEXT)
+        new_node = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertListEqual(
+            [
+                TextNode("only bold", TextType.BOLD)
+            ],
+            new_node,
+        )
 
 
 class TestExtractMarkdownImages(unittest.TestCase):
@@ -95,6 +105,12 @@ class TestExtractMarkdownImages(unittest.TestCase):
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
         )
         self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_link_in_image(self):
+        matches = extract_markdown_images(
+            "This is a text with a [link](https://boot.dev)"
+        )
+        self.assertListEqual([], matches)
 
     
 class TestExtractMarkdownLinks(unittest.TestCase):
@@ -109,6 +125,12 @@ class TestExtractMarkdownLinks(unittest.TestCase):
             ],
             matches,
         )
+    
+    def test_image_in_link(self):
+        matches = extract_markdown_links(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([], matches)
 
 if __name__ == "__main__":
     unittest.main()
